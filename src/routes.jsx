@@ -6,9 +6,11 @@ import {
   DocumentTextIcon,
   ArchiveBoxIcon,
   ClipboardDocumentCheckIcon,
+  InformationCircleIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Orders, Products, Invoice, RawMaterials, UsedMaterials } from "@/pages/dashboard";
-import { SignIn, SignUp } from "@/pages/auth";
+import { Home, Orders, Products, Invoice, RawMaterials, UsedMaterials, Account, Register } from "@/pages/dashboard";
+import { SignIn} from "@/pages/auth";
 import { AddNewProduct, InvoiceDetails, AddNewMaterials, AddConsumedMaterial, ViewOrder } from "@/pages/screen";
 
 const icon = {
@@ -33,14 +35,14 @@ export const routes = [
       },
       {
         icon: <ArchiveBoxIcon {...icon} />,
-        name: "raw materials",
-        path: "/rawmaterials",
+        name: "materials",
+        path: "/materials",
         element: <RawMaterials />,
       },
       {
         icon: <ClipboardDocumentCheckIcon {...icon} />,
-        name: "used materials",
-        path: "/usedmaterials",
+        name: "Consumed",
+        path: "/Consumed",
         element: <UsedMaterials />,
       },
       {
@@ -55,6 +57,18 @@ export const routes = [
         path: "/invoice",
         element: <Invoice />,
       },
+      {
+        icon: <InformationCircleIcon {...icon} />, // Changed the icon for register
+        name: "register",
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        icon: <UserCircleIcon {...icon} />,
+        name: "account",
+        path: "/account",
+        element: <Account />,
+      },
     ],
   },
   {
@@ -66,12 +80,6 @@ export const routes = [
         name: "sign in",
         path: "/sign-in",
         element: <SignIn />,
-      },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "sign up",
-        path: "/sign-up",
-        element: <SignUp />,
       },
     ],
   },

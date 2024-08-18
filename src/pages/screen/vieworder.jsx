@@ -47,6 +47,7 @@ export function ViewOrder() {
               price: item.price,
               quantity: item.quantity,
               totalAmount: item.totalAmount,
+              imageUrl: item.imageUrl,
               date: data.date,
             });
             combinedOrder.totalAmount += item.totalAmount;
@@ -71,11 +72,14 @@ export function ViewOrder() {
   const handleSaveOrder = async () => {
     if (!orderSummary) return;
 
+    const sessionUser = JSON.parse(sessionStorage.getItem('user'));
+
     const factoryInvoiceData = {
       customerAddress: orderSummary.address,
+      customerEmail: orderSummary.email,
       dateIssued: date,
       factoryDetails: "Guntur, Nallapadu",
-      factoryPhoneNumber: "1324563678",
+      factoryPhoneNumber: sessionUser.phone,
       invoiceNumber: Math.floor(100000 + Math.random() * 900000),
       invoiceTo: orderSummary.name,
       items: orderSummary.products.map(product => ({
@@ -84,16 +88,14 @@ export function ViewOrder() {
         quantity: product.quantity,
         cost: product.totalAmount,
       })),
-      salesPerson: "Sarath Kuruganti",
+      salesPerson: sessionUser.name,
       generatedby: "factory",
       total: orderSummary.totalAmount,
     };
 
     try {
-      // Save the order as an invoice
       await addDoc(collection(db, 'invoice'), factoryInvoiceData);
 
-      // Fetch all orders to delete
       const ordersQuery = query(
         collection(db, 'DOrders'),
         where('email', '==', email),
@@ -101,7 +103,6 @@ export function ViewOrder() {
       );
       const ordersSnapshot = await getDocs(ordersQuery);
 
-      // Delete each order document
       const deletePromises = [];
       ordersSnapshot.forEach(docSnapshot => {
         const orderDocRef = doc(db, 'DOrders', docSnapshot.id);
@@ -143,49 +144,73 @@ export function ViewOrder() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden p-6">
-        <div className="mb-6 text-center">
-          <h3 className="text-xl font-semibold">
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden p-4 sm:p-6">
+        <div className="mb-4 sm:mb-6 text-center">
+          <h3 className="text-lg sm:text-xl font-semibold">
             Customer: {orderSummary.name} ({orderSummary.email})
           </h3>
-          <p>
+          <p className="text-sm sm:text-base">
             <strong>Phone:</strong> {orderSummary.phone} | <strong>Address:</strong> {orderSummary.address}
           </p>
         </div>
 
-        <div className="mb-6 text-center">
-          <p>
+        <div className="mb-4 sm:mb-6 text-center">
+          <p className="text-sm sm:text-base">
             <strong>Date:</strong> {date} | <strong>Total Orders:</strong> {orderSummary.totalOrders} | <strong>Total Amount:</strong> ₹{orderSummary.totalAmount}
           </p>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300">
-            <thead className="bg-black">
-              <tr>
-                <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">PRODUCT</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">PRICE</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">QUANTITY</th>
-                <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">TOTAL AMOUNT</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orderSummary.products.map((product, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">{product.productName}</td>
-                  <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">₹{product.price}</td>
-                  <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">{product.quantity}</td>
-                  <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">₹{product.totalAmount}</td>
+        <div className="hidden lg:block">
+          {/* Table for desktop */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-300">
+              <thead className="bg-black">
+                <tr>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">IMAGE</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">PRODUCT</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">PRICE</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">QUANTITY</th>
+                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-white">TOTAL AMOUNT</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {orderSummary.products.map((product, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">
+                      <img src={product.imageUrl} alt={product.productName} className="h-16 w-24 object-cover rounded" />
+                    </td>
+                    <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">{product.productName}</td>
+                    <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">₹{product.price}</td>
+                    <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">{product.quantity}</td>
+                    <td className="px-6 py-4 border-b border-gray-300 text-sm text-gray-700">₹{product.totalAmount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="lg:hidden">
+          {/* Cards for mobile */}
+          <div className="space-y-4">
+            {orderSummary.products.map((product, index) => (
+              <div key={index} className="bg-white shadow-md rounded-lg p-4 flex flex-col sm:flex-row items-start">
+                <img src={product.imageUrl} alt={product.productName} className="h-32 w-32 object-cover rounded mb-4 sm:mb-0 sm:mr-4" />
+                <div className="flex-1">
+                  <h4 className="text-lg font-semibold">{product.productName}</h4>
+                  <p className="text-sm text-gray-600">Price: ₹{product.price}</p>
+                  <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
+                  <p className="text-sm text-gray-600">Total: ₹{product.totalAmount}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 sm:mt-6 text-center">
           <button
             onClick={handleSaveOrder}
-            className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 focus:outline-none"
+            className="bg-blue-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full hover:bg-blue-600 focus:outline-none"
           >
             Save Order
           </button>

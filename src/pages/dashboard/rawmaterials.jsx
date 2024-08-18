@@ -76,7 +76,7 @@ export function RawMaterials() {
 
   return (
     <div className="container mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center">Raw Materials</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center hidden md:block">Raw Materials</h2>
       <div className="overflow-x-auto">
         <div className="min-w-full bg-white shadow-md rounded-lg">
           <div className="grid grid-cols-5 bg-black text-white font-bold py-2">

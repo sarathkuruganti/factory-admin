@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
-import { db } from './../../../firebase'; // Ensure the path is correct
+import { auth, db } from './../../../firebase'; // Ensure the path is correct
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 export function SignIn() {
@@ -13,20 +14,31 @@ export function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Sign in the user
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Query Firestore to find a match for the uid and userType in the registrations collection
       const q = query(
         collection(db, 'registrations'),
-        where('email', '==', email),
-        where('password', '==', password)
+        where('uid', '==', user.uid),
+        where('userType', '==', 'Factory')
       );
       const querySnapshot = await getDocs(q);
+
       if (!querySnapshot.empty) {
-        navigate('/dashboard/home');
+        // Store user data in session storage
+        const userData = querySnapshot.docs[0].data();
+        sessionStorage.setItem('user', JSON.stringify(userData));
+
+        // Navigate to dashboard
+        navigate('/dashboard/products');
       } else {
-        setErrorMessage('Invalid credentials');
+        setErrorMessage('Access denied. Only Factory users can log in.');
       }
     } catch (error) {
-      console.error('Error validating credentials', error);
-      setErrorMessage('An error occurred. Please try again later.');
+      console.error('Error during sign-in or querying user data', error);
+      setErrorMessage('Invalid credentials. Please try again.');
     }
   };
 
@@ -38,7 +50,7 @@ export function SignIn() {
         </div>
         <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2" onSubmit={handleSubmit}>
           
-        {errorMessage && (
+          {errorMessage && (
             <Typography variant="medium" color="red" className="mb-4">
               {errorMessage}
             </Typography>
