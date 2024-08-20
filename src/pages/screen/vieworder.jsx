@@ -48,6 +48,7 @@ export function ViewOrder() {
               quantity: item.quantity,
               totalAmount: item.totalAmount,
               imageUrl: item.imageUrl,
+              pid:item.pid,
               date: data.date,
             });
             combinedOrder.totalAmount += item.totalAmount;
@@ -78,15 +79,16 @@ export function ViewOrder() {
       customerAddress: orderSummary.address,
       customerEmail: orderSummary.email,
       dateIssued: date,
-      factoryDetails: "Guntur, Nallapadu",
+      factoryDetails: sessionUser.factory,
       factoryPhoneNumber: sessionUser.phone,
-      invoiceNumber: Math.floor(100000 + Math.random() * 900000),
+      invoiceNumber: Number(`${new Date().toISOString().split('T')[0].replace(/-/g, '')}${Math.floor(1000 + Math.random() * 9000)}`),
       invoiceTo: orderSummary.name,
       items: orderSummary.products.map(product => ({
         item: product.productName,
         price: product.price,
         quantity: product.quantity,
         cost: product.totalAmount,
+        pid: product.pid,
       })),
       salesPerson: sessionUser.name,
       generatedby: "factory",
@@ -111,7 +113,7 @@ export function ViewOrder() {
 
       await Promise.all(deletePromises);
 
-      alert('Order saved and deleted successfully!');
+      alert('Order saved successfully!');
     } catch (error) {
       console.error('Error saving order or deleting details: ', error);
       alert('Failed to save order or delete order details. Please try again.');

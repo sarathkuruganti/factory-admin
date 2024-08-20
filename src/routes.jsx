@@ -10,7 +10,7 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Orders, Products, Invoice, RawMaterials, UsedMaterials, Account, Register } from "@/pages/dashboard";
-import { SignIn} from "@/pages/auth";
+import { SignIn, ForgotPassword} from "@/pages/auth";
 import { AddNewProduct, InvoiceDetails, AddNewMaterials, AddConsumedMaterial, ViewOrder } from "@/pages/screen";
 
 const icon = {
@@ -80,6 +80,12 @@ export const routes = [
         name: "sign in",
         path: "/sign-in",
         element: <SignIn />,
+      },
+      {
+        icon: <ServerStackIcon {...icon} />,
+        name: "forgot-password",
+        path: "/forgot-password",
+        element: <ForgotPassword />,
       },
     ],
   },

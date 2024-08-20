@@ -8,7 +8,7 @@ export function RawMaterials() {
   const [rawMaterials, setRawMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({ material: '', quantity: '', price: '', date: '' });
+  const [formData, setFormData] = useState({ material: '', quantity: '', price: '', date: '', description: '' });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +25,13 @@ export function RawMaterials() {
 
   const handleEdit = (material) => {
     setEditing(material.id);
-    setFormData({ material: material.material, quantity: material.quantity, price: material.price, date: material.date });
+    setFormData({
+      material: material.material,
+      quantity: material.quantity,
+      price: material.price,
+      date: material.date,
+      description: material.description || ''
+    });
   };
 
   const handleDelete = async (id) => {
@@ -55,7 +61,7 @@ export function RawMaterials() {
     await updateDoc(materialDoc, formData);
     setRawMaterials(rawMaterials.map(material => (material.id === id ? { id, ...formData } : material)));
     setEditing(null);
-    setFormData({ material: '', quantity: '', price: '', date: '' });
+    setFormData({ material: '', quantity: '', price: '', date: '', description: '' });
   };
 
   const handleChange = (e) => {
@@ -69,25 +75,28 @@ export function RawMaterials() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-      <div className="animate-spin h-8 w-8 border-4 border-t-4 border-blue-500 rounded-full"></div>
-    </div>
+        <div className="animate-spin h-8 w-8 border-4 border-t-4 border-blue-500 rounded-full"></div>
+      </div>
     );
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto px-4">
       <h2 className="text-2xl font-bold mb-6 text-center hidden md:block">Raw Materials</h2>
-      <div className="overflow-x-auto">
+
+      {/* Table for Desktop */}
+      <div className="hidden md:block">
         <div className="min-w-full bg-white shadow-md rounded-lg">
-          <div className="grid grid-cols-5 bg-black text-white font-bold py-2">
+          <div className="grid grid-cols-6 bg-black text-white font-bold py-2">
             <div className="px-4">Material</div>
             <div className="px-4">Quantity</div>
             <div className="px-4">Price</div>
             <div className="px-4">Date Bought</div>
+            <div className="px-4">Description</div>
             <div className="px-4">Actions</div>
           </div>
           {rawMaterials.map(material => (
-            <div key={material.id} className="grid grid-cols-5 border-t border-gray-200">
+            <div key={material.id} className="grid grid-cols-6 border-t border-gray-200">
               {editing === material.id ? (
                 <>
                   <div className="px-4 py-2">
@@ -102,16 +111,20 @@ export function RawMaterials() {
                   <div className="px-4 py-2">
                     <input type="date" name="date" value={formData.date} onChange={handleChange} className="w-full border border-gray-300 rounded px-2 py-1" />
                   </div>
+                  <div className="px-4 py-2">
+                    <textarea name="description" value={formData.description} onChange={handleChange} className="w-full border border-gray-300 rounded px-2 py-1" />
+                  </div>
                   <div className="px-4 py-2 flex items-center justify-center">
                     <PencilIcon onClick={() => handleSave(material.id)} className="text-black-500 hover:text-blue-700 w-6 h-6 cursor-pointer" />
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="px-4 py-2">{material.material}</div>
+                  <div className="px-4 py-2 capitalize">{material.material}</div>
                   <div className="px-4 py-2">{material.quantity}</div>
                   <div className="px-4 py-2">₹{material.price}</div>
                   <div className="px-4 py-2">{new Date(material.date).toLocaleDateString()}</div>
+                  <div className="px-4 py-2">{material.description || '__'}</div>
                   <div className="px-4 py-2 flex items-center justify-left space-x-4">
                     <PencilIcon onClick={() => handleEdit(material)} className="text-black-500 hover:text-blue-700 w-6 h-6 cursor-pointer" />
                     <TrashIcon onClick={() => handleDelete(material.id)} className="text-red-500 hover:text-red-700 w-6 h-6 cursor-pointer" />
@@ -122,6 +135,64 @@ export function RawMaterials() {
           ))}
         </div>
       </div>
+
+      {/* Card Structure for Mobile */}
+      <div className="md:hidden">
+        {rawMaterials.map(material => (
+          <div key={material.id} className="bg-white shadow-md rounded-lg mb-4 p-4 border border-gray-200">
+            {editing === material.id ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Material</label>
+                  <input type="text" name="material" value={formData.material} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded px-2 py-1" />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Quantity</label>
+                  <input type="text" name="quantity" value={formData.quantity} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded px-2 py-1" />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Price</label>
+                  <input type="number" name="price" value={formData.price} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded px-2 py-1" />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Date Bought</label>
+                  <input type="date" name="date" value={formData.date} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded px-2 py-1" />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea name="description" value={formData.description} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded px-2 py-1" />
+                </div>
+                <div className="flex items-center justify-center">
+                  <PencilIcon onClick={() => handleSave(material.id)} className="text-black-500 hover:text-blue-700 w-6 h-6 cursor-pointer" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-2">
+                  <span className="font-bold text-gray-800">Material:</span> {material.material}
+                </div>
+                <div className="mb-2">
+                  <span className="font-bold text-gray-800">Quantity:</span> {material.quantity}
+                </div>
+                <div className="mb-2">
+                  <span className="font-bold text-gray-800">Price:</span> ₹{material.price}
+                </div>
+                <div className="mb-2">
+                  <span className="font-bold text-gray-800">Date Bought:</span> {new Date(material.date).toLocaleDateString()}
+                </div>
+                <div className="mb-2">
+                  <span className="font-bold text-gray-800">Description:</span> {material.description || '__'}
+                </div>
+                <div className="flex items-center justify-left space-x-4 mt-4">
+                  <PencilIcon onClick={() => handleEdit(material)} className="text-black-500 hover:text-blue-700 w-6 h-6 cursor-pointer" />
+                  <TrashIcon onClick={() => handleDelete(material.id)} className="text-red-500 hover:text-red-700 w-6 h-6 cursor-pointer" />
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
       <div className="fixed bottom-4 right-4 flex space-x-4">
         <button
           onClick={() => navigate('/screen/addnewmaterials')}

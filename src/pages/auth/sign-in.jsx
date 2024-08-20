@@ -32,7 +32,7 @@ export function SignIn() {
         sessionStorage.setItem('user', JSON.stringify(userData));
 
         // Navigate to dashboard
-        navigate('/dashboard/products');
+        navigate('/dashboard/home');
       } else {
         setErrorMessage('Access denied. Only Factory users can log in.');
       }
@@ -87,6 +87,15 @@ export function SignIn() {
           <Button className="mt-6" fullWidth type="submit">
             Sign In
           </Button>
+          <div className="mt-4 text-center">
+            <Button
+              variant="text"
+              color="blue"
+              onClick={() => navigate('/auth/forgot-password')}
+            >
+              Forgot Password?
+            </Button>
+          </div>
         </form>
       </div>
       <div className="w-2/5 h-full hidden lg:block">

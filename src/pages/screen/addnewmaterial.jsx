@@ -7,6 +7,7 @@ export function AddNewMaterials() {
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [dateBought, setDateBought] = useState('');
+  const [description, setDescription] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -16,7 +17,8 @@ export function AddNewMaterials() {
         material,
         quantity,
         price,
-        date:dateBought,
+        date: dateBought,
+        description,
       });
       setSuccessMessage('Raw material added successfully!');
       console.log('Raw material added successfully!');
@@ -24,6 +26,7 @@ export function AddNewMaterials() {
       setQuantity('');
       setPrice('');
       setDateBought('');
+      setDescription('');
     } catch (e) {
       console.error('Error adding document: ', e);
     }
@@ -74,6 +77,16 @@ export function AddNewMaterials() {
             id="dateBought"
             value={dateBought}
             onChange={(e) => setDateBought(e.target.value)}
+            required
+            className="p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="description" className="mb-1 text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             required
             className="p-2 border border-gray-300 rounded-md"
           />

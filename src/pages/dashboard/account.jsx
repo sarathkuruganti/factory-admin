@@ -19,7 +19,7 @@ export function Account() {
   }
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="bg-gradient-to-r from-black to-black p-6">
           <h3 className="text-2xl font-bold text-white mb-2">Account Information</h3>
